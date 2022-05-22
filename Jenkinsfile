@@ -31,11 +31,11 @@ node {
         }
     }
 	
-#	stage("SonarQube Scan"){
-#        withSonarQubeEnv(credentialsId: 'SonarQubeToken') {
-#			sh "${sonarscanner}/bin/sonar-scanner"
-#		}
-#    }
+	stage("SonarQube Scan"){
+        withSonarQubeEnv(credentialsId: 'SonarQubeCreds') {
+			sh "${sonarscanner}/bin/sonar-scanner"
+		}
+    }
 	
 	stage("Ansible Deploy"){
         ansiblePlaybook inventory: 'hosts', playbook: 'deploy.yaml'
