@@ -24,18 +24,18 @@ node {
 
     stage('Push to Docker Registry'){
         withCredentials([usernamePassword(credentialsId: 'dockerHubAccount', usernameVariable: 'dockerUser', passwordVariable: 'dockerPassword')]) {
-            sh "docker login -u mchauhan22 -p myDOC@22#"
+            sh "docker login -u $dockerUser -p $dockerPassword"
             sh "docker tag $containerName:$tag $dockerUser/$containerName:$tag"
             sh "docker push $dockerUser/$containerName:$tag"
             echo "Image push complete"
         }
     }
 	
-	stage("SonarQube Scan"){
-        withSonarQubeEnv(credentialsId: 'SonarQubeToken') {
-			sh "${sonarscanner}/bin/sonar-scanner"
-		}
-    }
+#	stage("SonarQube Scan"){
+#        withSonarQubeEnv(credentialsId: 'SonarQubeToken') {
+#			sh "${sonarscanner}/bin/sonar-scanner"
+#		}
+#    }
 	
 	stage("Ansible Deploy"){
         ansiblePlaybook inventory: 'hosts', playbook: 'deploy.yaml'
