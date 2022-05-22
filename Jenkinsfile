@@ -4,6 +4,7 @@ def dockerHubUser="mchauhan22"
 def gitURL="https://github.com/mchauhan2017/SpringBootDocker.git"
 
 node {
+    def sonarscanner = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
     stage('Checkout') {
     checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: gitURL]]]
     }
@@ -28,8 +29,12 @@ node {
             sh "docker push $dockerUser/$containerName:$tag"
             echo "Image push complete"
         }
-    }
-	stage("Ansible Deploy"){
+    stage("SonarQube Scan"){
+        withSonarQubeEnv(credentialsId: 'SonarQubeToken') {
+			sh "${sonarscanner}/bin/sonar-scanner"
+		}
+       }
+    stage("Ansible Deploy"){
         ansiblePlaybook inventory: 'hosts', playbook: 'deploy.yaml'
     }
 }
